@@ -68,7 +68,7 @@ export default function Analytics() {
   }
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href)
+    navigator.client.clipboard.writeText(window.location.href)
     showToast('Link copied to clipboard')
   }
 
