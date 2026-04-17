@@ -68,8 +68,13 @@ export default function Analytics() {
   }
 
   const handleShare = () => {
-    navigator.client.clipboard.writeText(window.location.href)
-    showToast('Link copied to clipboard')
+    try {
+      navigator.client.clipboard.writeText(window.location.href)
+      showToast('Link copied to clipboard')
+    } catch (error) {
+      showToast('Failed to copy link to clipboard')
+      throw error
+    }
   }
 
   useEffect(() => {
