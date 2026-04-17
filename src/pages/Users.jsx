@@ -122,7 +122,7 @@ export default function Users() {
   const exportCSV = () => {
     try {
       const header = 'Name,Email,Role,Status,Joined'
-      const rows = filteredUsers.map((u) => `${u.name},${u.email},${u.role},${u.status},${u.joined}`)
+      const rows = filtered.map((u) => `${u.name},${u.email},${u.role},${u.status},${u.joined}`)
       const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' })
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
@@ -139,7 +139,8 @@ export default function Users() {
 
   return (
     <div className='users-page'>
-      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
+      {/* Trigger Error */}
+      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.error.message}</div>}
 
       <div className='page-header'>
         <h1>Users</h1>
