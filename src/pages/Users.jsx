@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import {
   Search,
   Trash2,
@@ -14,12 +14,33 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
-import { users as initialUsers } from '../data/mock'
 import './Users.css'
 
 const PAGE_SIZE = 6
 
 const emptyUser = { name: '', email: '', role: 'Viewer', status: 'pending' }
+const fallbackUsers = []
+const roles = ['Admin', 'Editor', 'Viewer']
+const statuses = ['active', 'inactive', 'pending']
+
+const getAvatar = (name) =>
+  name
+    .split(' ')
+    .map((word) => word[0])
+    .join('')
+    .toUpperCase()
+    .slice(0, 2)
+
+const formatApiUsers = (apiUsers) =>
+  apiUsers.map((user, index) => ({
+    id: user.id,
+    name: user.name,
+    email: user.email,
+    role: roles[index % roles.length],
+    status: statuses[index % statuses.length],
+    joined: `2024-${String((index % 12) + 1).padStart(2, '0')}-15`,
+    avatar: getAvatar(user.name)
+  }))
 
 export default function Users() {
   const [search, setSearch] = useState('')
@@ -29,16 +50,48 @@ export default function Users() {
   const [showModal, setShowModal] = useState(false)
   const [modalMode, setModalMode] = useState('edit')
   const [editUser, setEditUser] = useState(null)
-  const [users, setUsers] = useState(initialUsers)
+  const [users, setUsers] = useState(fallbackUsers)
   const [actionMenu, setActionMenu] = useState(null)
   const [showDetail, setShowDetail] = useState(null)
   const [page, setPage] = useState(0)
   const [toast, setToast] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [loadError, setLoadError] = useState('')
 
   const showToast = (message, type = 'success') => {
     setToast({ message, type })
     setTimeout(() => setToast(null), 5000)
   }
+
+  useEffect(() => {
+    let isMounted = true
+
+    const fetchUsers = async () => {
+      try {
+        setIsLoading(true)
+        setLoadError('')
+        const response = await fetch('https://jsonplaceholder.typicode.com/users')
+        if (!response.ok) {
+          throw new Error(`Request failed with status ${response.status}`)
+        }
+
+        const apiUsers = await response.json()
+        if (!isMounted) return
+        setUsers(formatApiUsers(apiUsers))
+      } catch (error) {
+        if (!isMounted) return
+        setLoadError(error.message || 'Failed to load users')
+        setUsers(fallbackUsers)
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
+    fetchUsers()
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   const filtered = users.filter((u) => {
     const matchSearch =
@@ -140,7 +193,8 @@ export default function Users() {
   return (
     <div className='users-page'>
       {/* Trigger Error */}
-      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.error.message}</div>}
+      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
+      {loadError && <div className='toast toast-error'>{loadError}</div>}
 
       <div className='page-header'>
         <h1>Users</h1>
@@ -199,6 +253,7 @@ export default function Users() {
       </div>
 
       <div className='users-table-wrapper'>
+        {isLoading && <div className='empty-state'>Loading users...</div>}
         <table className='users-table'>
           <thead>
             <tr>
