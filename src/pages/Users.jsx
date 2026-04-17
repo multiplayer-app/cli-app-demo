@@ -192,7 +192,6 @@ export default function Users() {
 
   return (
     <div className='users-page'>
-      {/* Trigger Error */}
       {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
       {loadError && <div className='toast toast-error'>{loadError}</div>}
 
