@@ -69,7 +69,7 @@ export default function Analytics() {
 
   const handleShare = async () => {
     try {
-      if (!navigator.clipboard) {
+      if (!navigator?.clipboard) {
         showToast('Clipboard not available')
         return
       }
