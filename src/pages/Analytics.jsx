@@ -40,8 +40,8 @@ export default function Analytics() {
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
 
-  const showToast = (msg) => {
-    setToast(msg)
+  const showToast = (message, type = 'success') => {
+    setToast({ message, type })
     setTimeout(() => setToast(null), 2000)
   }
 
@@ -53,7 +53,7 @@ export default function Analytics() {
     }
     const data = dataMap[type] || []
     if (data.length === 0) {
-      showToast(`No ${type} data to export`)
+      showToast(`No ${type} data to export`, 'error')
       return
     }
     const csv = Object.keys(data[0]).join(',') + '\n' + data.map((r) => Object.values(r).join(',')).join('\n')
@@ -72,7 +72,7 @@ export default function Analytics() {
       navigator.client.clipboard.writeText(window.location.href)
       showToast('Link copied to clipboard')
     } catch (error) {
-      showToast('Failed to copy link to clipboard')
+      showToast('Failed to copy link to clipboard', 'error')
       throw error
     }
   }
@@ -157,7 +157,7 @@ export default function Analytics() {
 
   return (
     <div className='analytics-page'>
-      {toast && <div className='toast'>{toast}</div>}
+      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
       {loadError && <div className='toast'>{loadError}</div>}
 
       <div className='page-header'>
