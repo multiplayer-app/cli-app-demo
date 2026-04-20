@@ -11,12 +11,12 @@ export default function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="users" element={<Users />} />
-          <Route path="orders" element={<Orders />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="settings" element={<Settings />} />
+          <Route index element={<Navigate to='/dashboard' replace />} />
+          <Route path='dashboard' element={<Dashboard />} />
+          <Route path='users' element={<Users />} />
+          <Route path='orders' element={<Orders />} />
+          <Route path='analytics' element={<Analytics />} />
+          <Route path='settings' element={<Settings />} />
         </Route>
       </Routes>
     </BrowserRouter>
