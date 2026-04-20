@@ -67,13 +67,15 @@ export default function Analytics() {
     showToast(`${type} data exported`)
   }
 
-  const handleShare = () => {
+  const handleShare = async () => {
     try {
-      navigator.client.clipboard.writeText(window.location.href)
+      if (!navigator.clipboard) {
+        throw new Error('Clipboard API not available')
+      }
+      await navigator.clipboard.writeText(window.location.href)
       showToast('Link copied to clipboard')
     } catch (error) {
       showToast('Failed to copy link to clipboard', 'error')
-      throw error
     }
   }
 
