@@ -14,24 +14,6 @@ const toInt = (value, fallback) => {
   return Number.isNaN(parsed) ? fallback : parsed
 }
 
-const shouldFailRequest = (req) => {
-  const forceFail = req.query.fail === '1'
-  const failRate = toInt(req.query.failRate ?? process.env.API_FAIL_RATE, 0)
-  const randomFailure = failRate > 0 && Math.random() * 100 < failRate
-  return forceFail || randomFailure
-}
-
-const delayMs = (req) => Math.max(0, toInt(req.query.delay ?? process.env.API_DELAY_MS, 0))
-
-const failResponse = (req, res) => {
-  const status = toInt(req.query.failStatus ?? process.env.API_FAIL_STATUS, 500)
-  res.status(status).json({
-    error: 'Simulated backend failure',
-    status,
-    path: req.path
-  })
-}
-
 const proxyGet = (upstreamPath) => async (req, res) => {
   try {
     const url = new URL(`${UPSTREAM_BASE_URL}${upstreamPath}`)
