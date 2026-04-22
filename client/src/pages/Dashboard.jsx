@@ -72,9 +72,9 @@ export default function Dashboard() {
         setLoadError('')
 
         const [usersRes, postsRes, commentsRes] = await Promise.all([
-          fetch('https://jsonplaceholder.typicode.com/users'),
-          fetch('https://jsonplaceholder.typicode.com/posts'),
-          fetch('https://jsonplaceholder.typicode.com/comments')
+          fetch('/api/users'),
+          fetch('/api/posts'),
+          fetch('/api/comments')
         ])
 
         if (!usersRes.ok || !postsRes.ok || !commentsRes.ok) {

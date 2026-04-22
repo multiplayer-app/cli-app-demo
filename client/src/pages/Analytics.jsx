@@ -85,10 +85,7 @@ export default function Analytics() {
         setIsLoading(true)
         setLoadError('')
 
-        const [postsRes, commentsRes] = await Promise.all([
-          fetch('https://jsonplaceholder.typicode.com/posts'),
-          fetch('https://jsonplaceholder.typicode.com/comments')
-        ])
+        const [postsRes, commentsRes] = await Promise.all([fetch('/api/posts'), fetch('/api/comments')])
 
         if (!postsRes.ok || !commentsRes.ok) {
           throw new Error('Failed to fetch analytics data')

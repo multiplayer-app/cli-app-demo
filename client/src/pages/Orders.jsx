@@ -69,10 +69,7 @@ export default function Orders() {
         setIsLoading(true)
         setLoadError('')
 
-        const [usersRes, postsRes] = await Promise.all([
-          fetch('https://jsonplaceholder.typicode.com/users'),
-          fetch('https://jsonplaceholder.typicode.com/posts')
-        ])
+        const [usersRes, postsRes] = await Promise.all([fetch('/api/users'), fetch('/api/posts')])
 
         if (!usersRes.ok || !postsRes.ok) {
           throw new Error('Failed to fetch placeholder data')

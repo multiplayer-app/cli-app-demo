@@ -1,16 +1,54 @@
-# React + Vite
+# Multiplayer CLI Demo App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project now includes a simple local backend server so the frontend can request data from `/api/*` instead of calling placeholder APIs directly.
 
-Currently, two official plugins are available:
+## Folder structure
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- `client/` - React + Vite frontend
+- `server/` - Express backend proxy
 
-## React Compiler
+## Run in development
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+pnpm dev
+```
 
-## Expanding the ESLint configuration
+This runs:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- Vite frontend on `http://localhost:5173`
+- Express backend on `http://localhost:8787`
+
+Vite proxies `/api` requests to the backend.
+
+## Backend endpoints
+
+- `GET /api/health`
+- `GET /api/users`
+- `GET /api/posts`
+- `GET /api/comments`
+
+The backend proxies data from JSONPlaceholder and can simulate errors/delay.
+
+## Simulate backend failures
+
+You can trigger failures from the browser by adding query params to any API request:
+
+- `?fail=1` force an error
+- `?failStatus=503` customize status code
+- `?failRate=30` fail ~30% of calls
+- `?delay=1200` add 1200ms response delay
+
+Example:
+
+```text
+/api/users?fail=1&failStatus=503
+```
+
+## Environment variables for global simulation
+
+Set these before running the backend:
+
+- `API_FAIL_RATE` - default failure rate percent
+- `API_FAIL_STATUS` - default failure status code
+- `API_DELAY_MS` - default response delay
+- `PORT` - backend port (defaults to `8787`)
