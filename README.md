@@ -24,6 +24,7 @@ Vite proxies `/api` requests to the backend.
 
 - `GET /api/health`
 - `GET /api/users`
+- `GET /api/users/export`
 - `GET /api/posts`
 - `GET /api/comments`
 

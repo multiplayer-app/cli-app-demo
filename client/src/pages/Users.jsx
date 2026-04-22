@@ -56,6 +56,7 @@ export default function Users() {
   const [page, setPage] = useState(0)
   const [toast, setToast] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [isExporting, setIsExporting] = useState(false)
   const [loadError, setLoadError] = useState('')
 
   const showToast = (message, type = 'success') => {
@@ -172,11 +173,20 @@ export default function Users() {
     showToast('Status updated')
   }
 
-  const exportCSV = () => {
+  const exportCSV = async () => {
     try {
-      const header = 'Name,Email,Role,Status,Joined'
-      const rows = filtered.map((u) => `${u.name},${u.email},${u.role},${u.status},${u.joined}`)
-      const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' })
+      setIsExporting(true)
+      const params = new URLSearchParams({
+        search,
+        role: roleFilter,
+        status: statusFilter
+      })
+      const response = await fetch(`/api/users/export?${params.toString()}`)
+      if (!response.ok) {
+        throw new Error(`Export failed with status ${response.status}`)
+      }
+
+      const blob = await response.blob()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -186,7 +196,8 @@ export default function Users() {
       showToast('Users exported')
     } catch (error) {
       showToast(`Export failed: ${error.message}`, 'error')
-      throw error
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -203,8 +214,8 @@ export default function Users() {
               <Trash2 size={14} /> Delete ({selectedUsers.size})
             </button>
           )}
-          <button className='btn' onClick={exportCSV}>
-            <Download size={14} /> Export
+          <button className='btn' onClick={exportCSV} disabled={isExporting}>
+            <Download size={14} /> {isExporting ? 'Exporting...' : 'Export'}
           </button>
           <button className='btn btn-primary' onClick={openCreate}>
             <Plus size={14} /> Add User

@@ -12,7 +12,6 @@
     "preview": "cd client && vite preview"
   },
   "dependencies": {
-    "@multiplayer-app/session-recorder-react": "^2.0.44",
     "cors": "^2.8.6",
     "express": "^5.2.1",
     "lucide-react": "^1.7.0",
