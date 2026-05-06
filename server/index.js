@@ -1,6 +1,8 @@
 /* global process */
+import './instrumentation.js'
 import express from 'express'
 import cors from 'cors'
+import { Integrations } from '@multiplayer-app/session-recorder-node'
 
 const app = express()
 const PORT = Number(process.env.PORT || 8787)
@@ -111,6 +113,9 @@ app.get('/api/health', (_req, res) => {
 app.get('/api/users', proxyGet('/users'))
 app.get('/api/posts', proxyGet('/posts'))
 app.get('/api/comments', proxyGet('/comments'))
+
+// Error handler middleware for HTTP 5xx errors
+app.use(Integrations.express.expressErrorHandler())
 
 app.listen(PORT, () => {
   console.log(`Mock backend server listening on http://localhost:${PORT}`)

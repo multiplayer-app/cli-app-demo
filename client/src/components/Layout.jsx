@@ -1,17 +1,19 @@
-import { NavLink, Outlet } from 'react-router-dom'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
+import SessionRecorder, { UserType } from '@multiplayer-app/session-recorder-react'
+import { useNavigationRecorder } from '@multiplayer-app/session-recorder-react'
 import {
-  LayoutDashboard,
   Users,
-  ShoppingBag,
-  BarChart3,
-  Settings,
-  ChevronLeft,
-  ChevronRight,
-  Search,
   Bell,
+  Search,
+  LogOut,
+  Settings,
+  BarChart3,
   CheckCheck,
-  LogOut
+  ChevronLeft,
+  ShoppingBag,
+  ChevronRight,
+  LayoutDashboard
 } from 'lucide-react'
 import { notifications as initialNotifications } from '../data/mock'
 import './Layout.css'
@@ -29,6 +31,12 @@ export default function Layout() {
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState(initialNotifications)
   const unreadCount = notifications.filter((n) => !n.read).length
+  const location = useLocation()
+
+  // Track navigation for session recording
+  useNavigationRecorder(location.pathname, {
+    navigationType: 'push'
+  })
 
   const markAllRead = () => {
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
@@ -42,6 +50,10 @@ export default function Layout() {
     setNotifications([])
     setShowNotifications(false)
   }
+
+  useEffect(() => {
+    SessionRecorder.setUserAttributes({ type: UserType.USER, userName: 'John Doe' })
+  }, [])
 
   return (
     <div className='layout'>
