@@ -1,11 +1,12 @@
-/* global process */
+import 'dotenv/config'
 import './instrumentation.js'
 import express from 'express'
 import cors from 'cors'
 import { Integrations } from '@multiplayer-app/session-recorder-node'
+import { PORT } from './config.js'
 
 const app = express()
-const PORT = Number(process.env.PORT || 8787)
+
 const UPSTREAM_BASE_URL = 'https://jsonplaceholder.typicode.com'
 
 app.use(cors())
