@@ -1,19 +1,29 @@
-/* global process */
-import 'dotenv/config'
 import { NodeSDK } from '@opentelemetry/sdk-node'
+import { ParentBasedSampler } from '@opentelemetry/sdk-trace-base'
 import {
   SessionRecorderIdGenerator,
   SessionRecorderHttpTraceExporter,
   SessionRecorderHttpLogsExporter,
-  SessionRecorderHttpInstrumentationHooksNode
+  SessionRecorderHttpInstrumentationHooksNode,
+  SessionRecorderTraceIdRatioBasedSampler
 } from '@multiplayer-app/session-recorder-node'
-import { getNodeAutoInstrumentations } from '@opentelemetry/auto-instrumentations-node'
+import {
+  getNodeAutoInstrumentations
+} from '@opentelemetry/auto-instrumentations-node'
+import {
+  MULTIPLAYER_SDK_API_KEY,
+  ENVIRONMENT,
+  OTLP_SAMPLE_RATE
+} from './config.js'
 
 /**
  * Initialize OpenTelemetry with Multiplayer exporters and auto-instrumentation.
  * This module MUST be imported before any other application code.
  */
 const sdk = new NodeSDK({
+  sampler: new ParentBasedSampler({
+    root: new SessionRecorderTraceIdRatioBasedSampler(OTLP_SAMPLE_RATE),
+  }),
   traceIdGenerator: new SessionRecorderIdGenerator(),
   instrumentations: [
     ...getNodeAutoInstrumentations({
@@ -38,15 +48,15 @@ const sdk = new NodeSDK({
     })
   ],
   traceExporter: new SessionRecorderHttpTraceExporter({
-    apiKey: process.env.MULTIPLAYER_SDK_API_KEY
+    apiKey: MULTIPLAYER_SDK_API_KEY
   }),
   logRecordExporter: new SessionRecorderHttpLogsExporter({
-    apiKey: process.env.MULTIPLAYER_SDK_API_KEY
+    apiKey: MULTIPLAYER_SDK_API_KEY
   }),
   resourceAttributes: {
     'service.name': 'multiplayer-cli-demo-app',
     'service.version': '0.0.0',
-    environment: process.env.ENVIRONMENT || process.env.NODE_ENV || 'development'
+    environment: ENVIRONMENT
   }
 })
 
