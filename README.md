@@ -10,7 +10,8 @@ This project now includes a simple local backend server so the frontend can requ
 ## Run in development
 
 ```bash
-pnpm dev
+npm install
+npm run dev
 ```
 
 This runs:
