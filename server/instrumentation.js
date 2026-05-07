@@ -19,7 +19,9 @@ import {
   ENVIRONMENT,
   OTLP_SAMPLE_RATE,
   SERVICE_NAME,
-  SERVICE_VERSION
+  SERVICE_VERSION,
+  MULTIPLAYER_OTEL_TRACES_EXPORTER_HTTP_URL,
+  MULTIPLAYER_OTEL_LOGS_EXPORTER_HTTP_URL
 } from './config.js'
 
 /**
@@ -70,9 +72,11 @@ const sdk = new NodeSDK({
   ],
   traceExporter: new SessionRecorderHttpTraceExporter({
     apiKey: MULTIPLAYER_SDK_API_KEY,
+    url: MULTIPLAYER_OTEL_TRACES_EXPORTER_HTTP_URL // optional
   }),
   logRecordExporter: new SessionRecorderHttpLogsExporter({
     apiKey: MULTIPLAYER_SDK_API_KEY,
+    url: MULTIPLAYER_OTEL_LOGS_EXPORTER_HTTP_URL // optional
   }),
 })
 
