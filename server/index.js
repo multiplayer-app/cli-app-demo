@@ -61,7 +61,7 @@ const usersToDashboardUsers = (apiUsers) => {
 const escapeCsvCell = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`
 
 app.get('/api/users/export', async (req, res) => {
-  if (req.query.crashValue.length > 0) {
+  if (req.query.crashValue?.length > 0) {
     JSON.parse(req.query.crashValue)
   }
 
