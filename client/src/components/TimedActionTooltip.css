@@ -1,0 +1,104 @@
+.timed-action-tooltip-root {
+  display: inline-flex;
+  vertical-align: middle;
+}
+
+.timed-action-tooltip-anchor {
+  display: inline-flex;
+}
+
+/* Portaled popover — position via inline fixed left/top from JS */
+.timed-action-tooltip-popover--portal {
+  max-width: min(280px, calc(100vw - 32px));
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text-heading);
+  font-size: 12px;
+  line-height: 1.45;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+  pointer-events: none;
+  white-space: normal;
+  text-align: center;
+  animation: timed-action-tooltip-enter-portal 0.22s ease;
+}
+
+/* Arrow points down (tooltip sits above anchor) */
+.timed-action-tooltip-popover--above::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -6px;
+  border: 6px solid transparent;
+  border-top-color: var(--border);
+}
+
+.timed-action-tooltip-popover--above::before {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  margin-top: -1px;
+  border: 5px solid transparent;
+  border-top-color: var(--bg-card);
+  z-index: 1;
+}
+
+/* Arrow points up (tooltip sits below anchor) */
+.timed-action-tooltip-popover--below::after {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -6px;
+  margin-bottom: -1px;
+  border: 6px solid transparent;
+  border-bottom-color: var(--border);
+}
+
+.timed-action-tooltip-popover--below::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -5px;
+  margin-bottom: 0;
+  border: 5px solid transparent;
+  border-bottom-color: var(--bg-card);
+  z-index: 1;
+}
+
+@keyframes timed-action-tooltip-enter-portal {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.timed-action-tooltip-popover--portal.timed-action-tooltip-popover--below {
+  animation-name: timed-action-tooltip-enter-portal-below;
+}
+
+@keyframes timed-action-tooltip-enter-portal-below {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .timed-action-tooltip-popover--portal {
+    animation: none;
+  }
+}

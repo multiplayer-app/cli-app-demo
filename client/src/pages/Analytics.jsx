@@ -15,6 +15,7 @@ import {
   Share2
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import TimedActionTooltip from '../components/TimedActionTooltip'
 import './Analytics.css'
 
 const metrics = [
@@ -166,9 +167,11 @@ export default function Analytics() {
       <div className='page-header'>
         <h1>Analytics</h1>
         <div className='header-actions'>
-          <button type='button' className='btn demo-issue-trigger' onClick={handleShare}>
-            <Share2 size={14} /> Share
-          </button>
+          <TimedActionTooltip>
+            <button type='button' className='btn demo-issue-trigger' onClick={handleShare}>
+              <Share2 size={14} /> Share
+            </button>
+          </TimedActionTooltip>
           <button
             type='button'
             className={`btn demo-issue-trigger ${compareMode ? 'btn-active' : ''}`}

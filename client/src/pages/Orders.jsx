@@ -18,6 +18,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import TimedActionTooltip from '../components/TimedActionTooltip'
 import './Orders.css'
 
 const PAGE_SIZE = 8
@@ -235,9 +236,11 @@ export default function Orders() {
       <div className='page-header'>
         <h1>Orders</h1>
         <div className='header-actions'>
-          <button type='button' className='btn demo-issue-trigger' onClick={exportCSV}>
-            <Download size={14} /> Export
-          </button>
+          <TimedActionTooltip>
+            <button type='button' className='btn demo-issue-trigger' onClick={exportCSV}>
+              <Download size={14} /> Export
+            </button>
+          </TimedActionTooltip>
           <button className='btn btn-primary' onClick={() => setShowCreateModal(true)}>
             <Plus size={14} /> New Order
           </button>
