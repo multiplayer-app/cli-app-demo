@@ -3,7 +3,7 @@ import { createPortal } from 'react-dom'
 import './TimedActionTooltip.css'
 
 const HIDE_AFTER_MS = 5000
-const SHOW_AFTER_MS = 1000
+const SHOW_AFTER_MS = 500
 
 /** Shown on demo-issue-trigger controls across pages */
 export const DEMO_ERROR_TOOLTIP = 'Click the outlined button to trigger a demo error.'
