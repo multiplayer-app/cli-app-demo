@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react'
+import { useToast } from '../context/ToastContext'
 import './Users.css'
 
 const PAGE_SIZE = 6
@@ -43,6 +44,7 @@ const formatApiUsers = (apiUsers) =>
   }))
 
 export default function Users() {
+  const { showToast } = useToast()
   const [search, setSearch] = useState('')
   const [roleFilter, setRoleFilter] = useState('all')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -54,15 +56,9 @@ export default function Users() {
   const [actionMenu, setActionMenu] = useState(null)
   const [showDetail, setShowDetail] = useState(null)
   const [page, setPage] = useState(0)
-  const [toast, setToast] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [isExporting, setIsExporting] = useState(false)
   const [loadError, setLoadError] = useState('')
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type })
-    setTimeout(() => setToast(null), 5000)
-  }
 
   useEffect(() => {
     let isMounted = true
@@ -186,7 +182,7 @@ export default function Users() {
         throw new Error(`Export failed with status ${response.status}`)
       }
 
-      const blob = await response.blob()
+      const blob = await response.json()
       const url = URL.createObjectURL(blob)
       const a = document.createElement('a')
       a.href = url
@@ -196,6 +192,7 @@ export default function Users() {
       showToast('Users exported')
     } catch (error) {
       showToast(`Export failed: ${error.message}`, 'error')
+      throw error
     } finally {
       setIsExporting(false)
     }
@@ -203,7 +200,6 @@ export default function Users() {
 
   return (
     <div className='users-page'>
-      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
       {loadError && <div className='toast toast-error'>{loadError}</div>}
 
       <div className='page-header'>
@@ -214,7 +210,7 @@ export default function Users() {
               <Trash2 size={14} /> Delete ({selectedUsers.size})
             </button>
           )}
-          <button className='btn' onClick={exportCSV} disabled={isExporting}>
+          <button type='button' className='btn demo-issue-trigger' onClick={exportCSV} disabled={isExporting}>
             <Download size={14} /> {isExporting ? 'Exporting...' : 'Export'}
           </button>
           <button className='btn btn-primary' onClick={openCreate}>
@@ -322,8 +318,23 @@ export default function Users() {
                       {actionMenu === user.id && (
                         <div className='action-dropdown'>
                           <button
+                            type='button'
+                            className='demo-issue-trigger'
                             onClick={() => {
-                              showToast(`Email sent to ${user.name}`)
+                              try {
+                                fetch('/api/users/notify', {
+                                  method: 'POST',
+                                  headers: { 'Content-Type': 'application/json' },
+                                  body: JSON.stringify({
+                                    userId: user.id,
+                                    templateId: globalThis.__emailTemplates.USER_DIGEST_TEMPLATE
+                                  })
+                                })
+                                showToast(`Email sent to ${user.name}`)
+                              } catch (error) {
+                                showToast(`Email draft failed: ${error.message}`, 'error')
+                                throw error
+                              }
                               setActionMenu(null)
                             }}
                           >

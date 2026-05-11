@@ -26,6 +26,7 @@ import {
   MoreHorizontal,
   ExternalLink
 } from 'lucide-react'
+import { useToast } from '../context/ToastContext'
 import './Dashboard.css'
 
 const stats = [
@@ -47,21 +48,16 @@ const fallbackTrafficData = []
 const fallbackOrders = []
 
 export default function Dashboard() {
+  const { showToast } = useToast()
   const [timeRange, setTimeRange] = useState('year')
   const [recentOrders, setRecentOrders] = useState(fallbackOrders)
   const [revenueData, setRevenueData] = useState(fallbackRevenueData)
   const [trafficData, setTrafficData] = useState(fallbackTrafficData)
   const [refreshing, setRefreshing] = useState(false)
   const [actionMenuId, setActionMenuId] = useState(null)
-  const [toast, setToast] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
   const navigate = useNavigate()
-
-  const showToast = (msg) => {
-    setToast(msg)
-    setTimeout(() => setToast(null), 2000)
-  }
 
   useEffect(() => {
     let isMounted = true
@@ -141,7 +137,7 @@ export default function Dashboard() {
     }, 800)
   }
 
-  const handleExport = () => {
+  const handleExportSafe = () => {
     const data = JSON.stringify({ stats, revenueData, trafficData }, null, 2)
     const blob = new Blob([data], { type: 'application/json' })
     const url = URL.createObjectURL(blob)
@@ -151,6 +147,23 @@ export default function Dashboard() {
     a.click()
     URL.revokeObjectURL(url)
     showToast('Report downloaded')
+  }
+
+  const handleExportDemo = () => {
+    try {
+      const data = JSON.stringify({ stats, revenueData, trafficData }, null, 2)
+      const blob = new Blob([data], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'dashboard-report.json'
+      a.click()
+      URL.revokeURL(url)
+      showToast('Report downloaded')
+    } catch (error) {
+      showToast('Report export cleanup failed', 'error')
+      throw error
+    }
   }
 
   const removeOrder = (id) => {
@@ -167,8 +180,7 @@ export default function Dashboard() {
 
   return (
     <div className='dashboard'>
-      {toast && <div className='toast'>{toast}</div>}
-      {loadError && <div className='toast'>{loadError}</div>}
+      {loadError && <div className='toast toast-error'>{loadError}</div>}
 
       <div className='page-header'>
         <h1>Dashboard</h1>
@@ -176,7 +188,7 @@ export default function Dashboard() {
           <button className={`btn icon-rotate ${refreshing ? 'spinning' : ''}`} onClick={handleRefresh}>
             <RefreshCw size={14} /> Refresh
           </button>
-          <button className='btn' onClick={handleExport}>
+          <button type='button' className='btn demo-issue-trigger' onClick={handleExportDemo}>
             <Download size={14} /> Export
           </button>
           <div className='time-filter'>
@@ -217,7 +229,7 @@ export default function Dashboard() {
             key={action.label}
             className='quick-action-btn'
             onClick={() => {
-              if (action.label === 'Generate Report') handleExport()
+              if (action.label === 'Generate Report') handleExportSafe()
               else if (action.label === 'View Analytics') navigate('/analytics')
               else if (action.label === 'Sync Data') handleRefresh()
             }}

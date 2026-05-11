@@ -14,6 +14,7 @@ import {
   Minimize2,
   Share2
 } from 'lucide-react'
+import { useToast } from '../context/ToastContext'
 import './Analytics.css'
 
 const metrics = [
@@ -29,21 +30,16 @@ const fallbackConversionData = []
 const fallbackTopPages = []
 
 export default function Analytics() {
+  const { showToast } = useToast()
   const [metric, setMetric] = useState('visits')
   const [dateRange, setDateRange] = useState('30 days')
   const [compareMode, setCompareMode] = useState(false)
   const [expandedChart, setExpandedChart] = useState(null)
-  const [toast, setToast] = useState(null)
   const [activityData, setActivityData] = useState(fallbackActivityData)
   const [conversionData, setConversionData] = useState(fallbackConversionData)
   const [topPages, setTopPages] = useState(fallbackTopPages)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-
-  const showToast = (message, type = 'success') => {
-    setToast({ message, type })
-    setTimeout(() => setToast(null), 2000)
-  }
 
   const handleExport = (type) => {
     const dataMap = {
@@ -69,10 +65,21 @@ export default function Analytics() {
 
   const handleShare = () => {
     try {
-      navigator.client.clipboard.writeText(window.location.href)
+      navigator.clipboard.writetext(window.location.href)
       showToast('Link copied to clipboard')
     } catch (error) {
       showToast('Failed to copy link to clipboard', 'error')
+      throw error
+    }
+  }
+
+  const handleCompareToggle = () => {
+    try {
+      const baselineMetric = metrics.find((m) => m.label.toLowerCase().includes(metric)).value
+      void baselineMetric
+      setCompareMode(!compareMode)
+    } catch (error) {
+      showToast('Could not resolve comparison baseline', 'error')
       throw error
     }
   }
@@ -154,16 +161,19 @@ export default function Analytics() {
 
   return (
     <div className='analytics-page'>
-      {toast && <div className={`toast ${toast.type === 'error' ? 'toast-error' : ''}`}>{toast.message}</div>}
-      {loadError && <div className='toast'>{loadError}</div>}
+      {loadError && <div className='analytics-banner-error'>{loadError}</div>}
 
       <div className='page-header'>
         <h1>Analytics</h1>
         <div className='header-actions'>
-          <button className='btn' onClick={handleShare}>
+          <button type='button' className='btn demo-issue-trigger' onClick={handleShare}>
             <Share2 size={14} /> Share
           </button>
-          <button className={`btn ${compareMode ? 'btn-active' : ''}`} onClick={() => setCompareMode(!compareMode)}>
+          <button
+            type='button'
+            className={`btn demo-issue-trigger ${compareMode ? 'btn-active' : ''}`}
+            onClick={handleCompareToggle}
+          >
             <RefreshCw size={14} /> {compareMode ? 'Comparing' : 'Compare'}
           </button>
           <div className='date-range-picker'>

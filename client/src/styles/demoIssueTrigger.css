@@ -1,0 +1,33 @@
+/* Highlights controls that intentionally throw errors for auto-fix demos — dual-layer red glow with pulsing shadow */
+
+.demo-issue-trigger {
+  position: relative;
+  z-index: 1;
+  animation: demo-issue-pulse-shadow 2.4s ease-in-out infinite;
+}
+
+@keyframes demo-issue-pulse-shadow {
+  0%,
+  100% {
+    box-shadow:
+      0 0 0 1px rgba(215, 52, 58, 0.38),
+      0 0 8px 2px rgba(208, 48, 54, 0.26),
+      0 0 14px 4px rgba(198, 42, 48, 0.13);
+  }
+  50% {
+    box-shadow:
+      0 0 0 2px rgba(224, 72, 76, 0.48),
+      0 0 12px 3px rgba(210, 52, 56, 0.34),
+      0 0 20px 6px rgba(192, 44, 50, 0.18);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .demo-issue-trigger {
+    animation: none;
+    box-shadow:
+      0 0 0 1px rgba(215, 52, 58, 0.42),
+      0 0 10px 3px rgba(208, 48, 54, 0.28),
+      0 0 16px 5px rgba(192, 42, 48, 0.14);
+  }
+}

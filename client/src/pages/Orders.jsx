@@ -17,6 +17,7 @@ import {
   Copy,
   CheckCircle
 } from 'lucide-react'
+import { useToast } from '../context/ToastContext'
 import './Orders.css'
 
 const PAGE_SIZE = 8
@@ -38,6 +39,7 @@ const emptyOrder = {
 }
 
 export default function Orders() {
+  const { showToast } = useToast()
   const [orders, setOrders] = useState(defaultOrders)
   const [search, setSearch] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
@@ -52,14 +54,8 @@ export default function Orders() {
   const [newOrder, setNewOrder] = useState({ ...emptyOrder })
   const [actionMenu, setActionMenu] = useState(null)
   const [copiedId, setCopiedId] = useState(null)
-  const [toast, setToast] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-
-  const showToast = (msg) => {
-    setToast(msg)
-    setTimeout(() => setToast(null), 2000)
-  }
 
   useEffect(() => {
     let isMounted = true
@@ -191,16 +187,25 @@ export default function Orders() {
   }
 
   const copyId = (id) => {
-    navigator.clipboard.writeText(id)
-    setCopiedId(id)
-    setTimeout(() => setCopiedId(null), 1500)
+    try {
+      navigator.clipboard.writeText(id)
+      setCopiedId(id)
+      setTimeout(() => setCopiedId(null), 1500)
+    } catch (error) {
+      showToast('Could not copy order ID', 'error')
+      throw error
+    }
   }
 
   const exportCSV = () => {
     const header = 'ID,Customer,Email,Items,Amount,Status,Date,Payment,Shipping'
-    const rows = filtered.map(
-      (o) => `${o.id},${o.customer},${o.email},${o.items},${o.amount},${o.status},${o.date},${o.payment},${o.shipping}`
-    )
+    let rows
+    try {
+      rows = filtered.map((o) => o.toCSVRow())
+    } catch (error) {
+      showToast('Could not serialize orders for CSV', 'error')
+      throw error
+    }
     const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' })
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -225,13 +230,12 @@ export default function Orders() {
 
   return (
     <div className='orders-page'>
-      {toast && <div className='toast'>{toast}</div>}
-      {loadError && <div className='toast'>{loadError}</div>}
+      {loadError && <div className='toast toast-error'>{loadError}</div>}
 
       <div className='page-header'>
         <h1>Orders</h1>
         <div className='header-actions'>
-          <button className='btn' onClick={exportCSV}>
+          <button type='button' className='btn demo-issue-trigger' onClick={exportCSV}>
             <Download size={14} /> Export
           </button>
           <button className='btn btn-primary' onClick={() => setShowCreateModal(true)}>
@@ -349,7 +353,7 @@ export default function Orders() {
                     <div className='customer-name'>{order.customer}</div>
                     <div className='customer-id'>
                       {order.id}
-                      <button className='copy-btn' onClick={() => copyId(order.id)}>
+                      <button type='button' className='copy-btn demo-issue-trigger' onClick={() => copyId(order.id)}>
                         {copiedId === order.id ? <CheckCircle size={12} /> : <Copy size={12} />}
                       </button>
                     </div>

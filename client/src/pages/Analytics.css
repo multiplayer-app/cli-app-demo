@@ -38,7 +38,9 @@
   cursor: pointer;
 }
 
-.btn:hover { background: var(--bg-card-hover); }
+.btn:hover {
+  background: var(--bg-card-hover);
+}
 
 .btn-active {
   background: var(--accent-bg);
@@ -69,8 +71,13 @@
   transition: all 0.15s;
 }
 
-.range-btn:hover { color: var(--text-heading); }
-.range-btn.active { background: var(--accent); color: white; }
+.range-btn:hover {
+  color: var(--text-heading);
+}
+.range-btn.active {
+  background: var(--accent);
+  color: white;
+}
 
 /* Metrics */
 .metrics-grid {
@@ -104,7 +111,10 @@
   justify-content: center;
 }
 
-.metric-label { font-size: 13px; color: var(--text); }
+.metric-label {
+  font-size: 13px;
+  color: var(--text);
+}
 
 .metric-value {
   font-size: 28px;
@@ -121,8 +131,12 @@
   gap: 2px;
 }
 
-.metric-change.positive { color: var(--green); }
-.metric-change.negative { color: var(--red); }
+.metric-change.positive {
+  color: var(--green);
+}
+.metric-change.negative {
+  color: var(--red);
+}
 
 /* Chart header */
 .chart-header {
@@ -132,7 +146,9 @@
   margin-bottom: 16px;
 }
 
-.chart-header h2 { margin: 0; }
+.chart-header h2 {
+  margin: 0;
+}
 
 .chart-actions {
   display: flex;
@@ -174,8 +190,13 @@
   transition: all 0.15s;
 }
 
-.toggle-btn:hover { color: var(--text-heading); }
-.toggle-btn.active { background: var(--accent); color: white; }
+.toggle-btn:hover {
+  color: var(--text-heading);
+}
+.toggle-btn.active {
+  background: var(--accent);
+  color: white;
+}
 
 /* Charts */
 .charts-split {
@@ -226,7 +247,9 @@
   color: var(--text-heading);
 }
 
-.page-views { color: var(--text); }
+.page-views {
+  color: var(--text);
+}
 
 .page-bar-bg {
   height: 6px;
@@ -242,23 +265,13 @@
   transition: width 0.3s ease;
 }
 
-/* Toast */
-.toast {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
+/* Load error banner (toasts use global ToastProvider) */
+.analytics-banner-error {
+  margin-bottom: 16px;
+  padding: 12px 16px;
   border-radius: 10px;
-  padding: 12px 20px;
   font-size: 13px;
-  color: var(--text-heading);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-  z-index: 300;
-  animation: slideUp 0.2s ease;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(10px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  color: white;
+  background: var(--red);
+  border: 1px solid var(--red);
 }
