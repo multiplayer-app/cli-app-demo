@@ -1,1 +1,29 @@
-/* unused - styles moved to index.css and component files */
+/* Global scrollbar — matches :root theme (see index.css) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--bg);
+  border-radius: 8px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 8px;
+  border: 2px solid var(--bg);
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--bg-card-hover);
+}
+
+*::-webkit-scrollbar-corner {
+  background: var(--bg);
+}

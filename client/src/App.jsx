@@ -1,3 +1,4 @@
+import './App.css'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ErrorBoundary } from '@multiplayer-app/session-recorder-react'
 import { ToastProvider } from './context/ToastContext'

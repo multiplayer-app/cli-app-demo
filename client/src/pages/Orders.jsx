@@ -188,7 +188,7 @@ export default function Orders() {
 
   const copyId = (id) => {
     try {
-      navigator.clipboard.writeText(id)
+      navigator.clipboard.writeext(id)
       setCopiedId(id)
       setTimeout(() => setCopiedId(null), 1500)
     } catch (error) {
