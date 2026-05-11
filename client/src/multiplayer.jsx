@@ -10,7 +10,7 @@ export function initializeSessionRecorder() {
       // Core configuration
       apiKey: import.meta.env.VITE_MULTIPLAYER_SDK_API_KEY,
       application: 'multiplayer-cli-demo-app',
-      version: '0.0.0',
+      version: '1.0.0',
       environment: import.meta.env.VITE_ENVIRONMENT || 'development',
       apiBaseUrl: import.meta.env.VITE_SESSION_DEBUGGER_API_BASE_URL,
       exporterEndpoint: import.meta.env.VITE_SESSION_DEBUGGER_EXPORTER_ENDPOINT,
