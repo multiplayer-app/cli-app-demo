@@ -23,7 +23,11 @@
   --yellow: #eab308;
   --yellow-bg: rgba(234, 179, 8, 0.12);
 
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   font-size: 14px;
   line-height: 1.5;
   color: var(--text);
@@ -49,7 +53,13 @@ button {
   font-family: inherit;
 }
 
-input, select, textarea {
+input,
+select,
+textarea {
   font-family: inherit;
   font-size: inherit;
+}
+
+.text-red-500 {
+  color: var(--red);
 }

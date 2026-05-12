@@ -73,15 +73,15 @@ export default function AutoCreatedSessionModal() {
           Make sure you&apos;ve connected the Multiplayer Debugging Agent to fix it.
         </p>
         <div className='auto-created-session-actions'>
-          <button type='button' className='auto-created-session-btn' onClick={handleNavigate}>
-            View the Session.
-          </button>
           <button
             type='button'
             className='auto-created-session-btn auto-created-session-btn-primary'
             onClick={handleClose}
           >
             Continue
+          </button>
+          <button type='button' className='auto-created-session-btn' onClick={handleNavigate}>
+            See Session
           </button>
         </div>
       </div>

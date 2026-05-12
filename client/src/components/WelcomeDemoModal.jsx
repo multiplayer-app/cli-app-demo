@@ -7,13 +7,13 @@ export default function WelcomeDemoModal() {
   const [open, setOpen] = useState(false)
 
   useEffect(() => {
-    if (typeof localStorage === 'undefined') return
-    if (localStorage.getItem(STORAGE_KEY)) return
+    if (typeof sessionStorage === 'undefined') return
+    if (sessionStorage.getItem(STORAGE_KEY)) return
     setOpen(true)
   }, [])
 
   const dismiss = () => {
-    localStorage.setItem(STORAGE_KEY, '1')
+    sessionStorage.setItem(STORAGE_KEY, '1')
     setOpen(false)
   }
 
@@ -32,8 +32,8 @@ export default function WelcomeDemoModal() {
           Welcome to the demo!
         </h2>
         <p className='auto-created-session-description'>
-          To see the Multiplayer Debugging Agent in action, simply click any button with a <b>red outline</b> to trigger
-          a bug and capture the session.
+          To see the Multiplayer Debugging Agent in action, simply click any button with a{' '}
+          <b className='text-red-500'>red outline</b> to trigger a bug and capture the session.
         </p>
         <div className='auto-created-session-actions' style={{ justifyContent: 'flex-end' }}>
           <button type='button' className='auto-created-session-btn auto-created-session-btn-primary' onClick={dismiss}>
