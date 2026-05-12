@@ -19,7 +19,6 @@ import {
   X
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
-import TimedActionTooltip from '../components/TimedActionTooltip'
 import './Settings.css'
 
 export default function Settings() {
@@ -162,11 +161,9 @@ export default function Settings() {
       <div className='page-header'>
         <h1>Settings</h1>
         <div className='header-actions'>
-          <TimedActionTooltip>
-            <button type='button' className='btn demo-issue-trigger' onClick={handleImportSettings}>
-              <Upload size={14} /> Import
-            </button>
-          </TimedActionTooltip>
+          <button type='button' className='btn demo-issue-trigger' onClick={handleImportSettings}>
+            <Upload size={14} /> Import
+          </button>
           <button className='btn' onClick={handleExportSettings}>
             <Download size={14} /> Export
           </button>

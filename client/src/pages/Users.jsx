@@ -15,7 +15,6 @@ import {
   ChevronRight
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
-import TimedActionTooltip from '../components/TimedActionTooltip'
 import './Users.css'
 
 const PAGE_SIZE = 6
@@ -211,11 +210,9 @@ export default function Users() {
               <Trash2 size={14} /> Delete ({selectedUsers.size})
             </button>
           )}
-          <TimedActionTooltip>
-            <button type='button' className='btn demo-issue-trigger' onClick={exportCSV} disabled={isExporting}>
-              <Download size={14} /> {isExporting ? 'Exporting...' : 'Export'}
-            </button>
-          </TimedActionTooltip>
+          <button type='button' className='btn demo-issue-trigger' onClick={exportCSV} disabled={isExporting}>
+            <Download size={14} /> {isExporting ? 'Exporting...' : 'Export'}
+          </button>
           <button className='btn btn-primary' onClick={openCreate}>
             <Plus size={14} /> Add User
           </button>

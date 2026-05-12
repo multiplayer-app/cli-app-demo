@@ -67,22 +67,21 @@ export default function AutoCreatedSessionModal() {
         className='auto-created-session-modal'
       >
         <h2 id='auto-created-session-heading' className='auto-created-session-title'>
-          You&apos;ve just recorded a session!
+          We found a bug!
         </h2>
         <p className='auto-created-session-description'>
-          We&apos;ve captured everything from frontend screens to deep backend traces, logs, request/response payloads
-          and headers — all correlated by session.
+          Make sure you&apos;ve connected the Multiplayer Debugging Agent to fix it.
         </p>
         <div className='auto-created-session-actions'>
-          <button type='button' className='auto-created-session-btn' onClick={handleClose}>
-            Cancel
+          <button type='button' className='auto-created-session-btn' onClick={handleNavigate}>
+            View the Session.
           </button>
           <button
             type='button'
             className='auto-created-session-btn auto-created-session-btn-primary'
-            onClick={handleNavigate}
+            onClick={handleClose}
           >
-            View the recording
+            Continue
           </button>
         </div>
       </div>

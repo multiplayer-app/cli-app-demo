@@ -27,7 +27,6 @@ import {
   ExternalLink
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
-import TimedActionTooltip from '../components/TimedActionTooltip'
 import './Dashboard.css'
 
 const stats = [
@@ -189,11 +188,9 @@ export default function Dashboard() {
           <button className={`btn icon-rotate ${refreshing ? 'spinning' : ''}`} onClick={handleRefresh}>
             <RefreshCw size={14} /> Refresh
           </button>
-          <TimedActionTooltip>
-            <button type='button' className='btn demo-issue-trigger' onClick={handleExportDemo}>
-              <Download size={14} /> Export
-            </button>
-          </TimedActionTooltip>
+          <button type='button' className='btn demo-issue-trigger' onClick={handleExportDemo}>
+            <Download size={14} /> Export
+          </button>
           <div className='time-filter'>
             {['week', 'month', 'year'].map((range) => (
               <button

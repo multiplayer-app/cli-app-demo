@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ErrorBoundary } from '@multiplayer-app/session-recorder-react'
 import { ToastProvider } from './context/ToastContext'
 import AutoCreatedSessionModal from './components/AutoCreatedSessionModal'
+import WelcomeDemoModal from './components/WelcomeDemoModal'
 import Layout from './components/Layout'
 import Dashboard from './pages/Dashboard'
 import Users from './pages/Users'
@@ -14,6 +15,7 @@ export default function App() {
   return (
     <ErrorBoundary fallback={<div>Something went wrong</div>}>
       <ToastProvider>
+        <WelcomeDemoModal />
         <AutoCreatedSessionModal />
         <BrowserRouter>
           <Routes>
