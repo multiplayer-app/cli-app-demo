@@ -35,7 +35,7 @@ export default function WelcomeDemoModal() {
           To see the Multiplayer Debugging Agent in action, simply click any button with a{' '}
           <b className='text-red-500'>red outline</b> to trigger a bug and capture the session.
         </p>
-        <div className='auto-created-session-actions' style={{ justifyContent: 'flex-end' }}>
+        <div className='auto-created-session-actions'>
           <button type='button' className='auto-created-session-btn auto-created-session-btn-primary' onClick={dismiss}>
             Got it
           </button>

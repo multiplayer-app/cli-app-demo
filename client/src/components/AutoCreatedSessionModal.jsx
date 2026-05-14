@@ -80,9 +80,6 @@ export default function AutoCreatedSessionModal() {
           >
             Continue
           </button>
-          <button type='button' className='auto-created-session-btn' onClick={handleNavigate}>
-            See Session
-          </button>
         </div>
       </div>
     </div>
