@@ -19,6 +19,7 @@ import {
   X
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Settings.css'
 
 export default function Settings() {
@@ -58,9 +59,16 @@ export default function Settings() {
   }
 
   const handleSave = () => {
-    setSaved(true)
-    showToast('Settings saved successfully')
-    setTimeout(() => setSaved(false), 2000)
+    try {
+      window.__settingsPersistence.commit(settings)
+      setSaved(true)
+      showToast('Settings saved successfully')
+      setTimeout(() => setSaved(false), 2000)
+    } catch (error) {
+      showToast('Could not persist settings', 'error')
+      captureBug(error)
+      throw error
+    }
   }
 
   const handleExportSettings = () => {
@@ -85,6 +93,7 @@ export default function Settings() {
         window.assertValidSettingsImportFile(file)
       } catch (error) {
         showToast('Import validation failed', 'error')
+        captureBug(error)
         throw error
       }
       const reader = new FileReader()
@@ -129,9 +138,15 @@ export default function Settings() {
   }
 
   const regenerateKey = (id) => {
-    const newKey = 'sk_' + Math.random().toString(36).slice(2, 18)
-    setApiKeys((prev) => prev.map((k) => (k.id === id ? { ...k, key: newKey, visible: true } : k)))
-    showToast('API key regenerated')
+    try {
+      const newKey = window.__cryptoUtils.generateSecret('api_key', 32)
+      setApiKeys((prev) => prev.map((k) => (k.id === id ? { ...k, key: newKey, visible: true } : k)))
+      showToast('API key regenerated')
+    } catch (error) {
+      showToast('Could not regenerate API key', 'error')
+      captureBug(error)
+      throw error
+    }
   }
 
   const handleReset = () => {
@@ -167,7 +182,11 @@ export default function Settings() {
           <button className='btn' onClick={handleExportSettings}>
             <Download size={14} /> Export
           </button>
-          <button className={`btn btn-primary save-btn ${saved ? 'saved' : ''}`} onClick={handleSave}>
+          <button
+            type='button'
+            className={`btn btn-primary save-btn demo-issue-trigger ${saved ? 'saved' : ''}`}
+            onClick={handleSave}
+          >
             {saved ? (
               <>
                 <Check size={15} /> Saved!
@@ -399,7 +418,11 @@ export default function Settings() {
                     <button className='icon-action' onClick={() => copyKey(k.key)}>
                       <Copy size={15} />
                     </button>
-                    <button className='icon-action' onClick={() => regenerateKey(k.id)}>
+                    <button
+                      type='button'
+                      className='icon-action demo-issue-trigger'
+                      onClick={() => regenerateKey(k.id)}
+                    >
                       <RefreshCw size={15} />
                     </button>
                     <button className='icon-action danger' onClick={() => deleteKey(k.id)}>
@@ -475,10 +498,18 @@ export default function Settings() {
                 Cancel
               </button>
               <button
-                className='btn btn-danger'
+                type='button'
+                className='btn btn-danger demo-issue-trigger'
                 onClick={() => {
-                  setShowDeleteConfirm(false)
-                  showToast('Account deletion requested')
+                  try {
+                    window.__accountService.scheduleDeletion({ email: settings.profileEmail })
+                    setShowDeleteConfirm(false)
+                    showToast('Account deletion requested')
+                  } catch (error) {
+                    showToast('Could not schedule account deletion', 'error')
+                    captureBug(error)
+                    throw error
+                  }
                 }}
               >
                 <Trash2 size={14} /> Confirm Delete

@@ -1,7 +1,13 @@
-import { NodeSDK } from '@opentelemetry/sdk-node'
 import { hostname } from 'os'
-import { ParentBasedSampler } from '@opentelemetry/sdk-trace-base'
-import { resourceFromAttributes, detectResources } from '@opentelemetry/resources'
+import { NodeTracerProvider } from '@opentelemetry/sdk-trace-node'
+import { BatchSpanProcessor, ParentBasedSampler } from '@opentelemetry/sdk-trace-base'
+import { LoggerProvider, BatchLogRecordProcessor } from '@opentelemetry/sdk-logs'
+import { logs } from '@opentelemetry/api-logs'
+import { resourceFromAttributes } from '@opentelemetry/resources'
+import { registerInstrumentations } from '@opentelemetry/instrumentation'
+import { HttpInstrumentation } from '@opentelemetry/instrumentation-http'
+import { ExpressInstrumentation } from '@opentelemetry/instrumentation-express'
+import { UndiciInstrumentation } from '@opentelemetry/instrumentation-undici'
 import {
   SessionRecorderIdGenerator,
   SessionRecorderHttpTraceExporter,
@@ -9,10 +15,6 @@ import {
   SessionRecorderHttpInstrumentationHooksNode,
   SessionRecorderTraceIdRatioBasedSampler
 } from '@multiplayer-app/session-recorder-node'
-import {
-  getNodeAutoInstrumentations,
-  getResourceDetectors
-} from '@opentelemetry/auto-instrumentations-node'
 import * as SemanticAttributes from '@opentelemetry/semantic-conventions'
 import {
   MULTIPLAYER_SDK_API_KEY,
@@ -25,11 +27,11 @@ import {
 } from './config.js'
 
 /**
- * Initialize OpenTelemetry with Multiplayer exporters and auto-instrumentation.
+ * Initialize OpenTelemetry with Multiplayer exporters and HTTP/Express instrumentation.
  * This module MUST be imported before any other application code.
  */
 
-const resourceWithAttributes = resourceFromAttributes({
+const resource = resourceFromAttributes({
   [SemanticAttributes.SEMRESATTRS_SERVICE_NAME]: SERVICE_NAME,
   [SemanticAttributes.SEMRESATTRS_SERVICE_VERSION]: SERVICE_VERSION,
   [SemanticAttributes.SEMRESATTRS_HOST_NAME]: hostname(),
@@ -37,57 +39,60 @@ const resourceWithAttributes = resourceFromAttributes({
   [SemanticAttributes.SEMRESATTRS_PROCESS_RUNTIME_VERSION]: process.version,
   [SemanticAttributes.SEMRESATTRS_PROCESS_PID]: process.pid,
 })
-const detectedResources = detectResources({
-  detectors: getResourceDetectors(),
-})
-const resource = resourceWithAttributes.merge(detectedResources)
 
-const sdk = new NodeSDK({
+const traceExporter = new SessionRecorderHttpTraceExporter({
+  apiKey: MULTIPLAYER_SDK_API_KEY,
+  url: MULTIPLAYER_OTEL_TRACES_EXPORTER_HTTP_URL
+})
+
+const logRecordExporter = new SessionRecorderHttpLogsExporter({
+  apiKey: MULTIPLAYER_SDK_API_KEY,
+  url: MULTIPLAYER_OTEL_LOGS_EXPORTER_HTTP_URL
+})
+
+const tracerProvider = new NodeTracerProvider({
+  resource,
   sampler: new ParentBasedSampler({
     root: new SessionRecorderTraceIdRatioBasedSampler(OTLP_SAMPLE_RATE),
   }),
-  traceIdGenerator: new SessionRecorderIdGenerator(),
-  resource,
-  instrumentations: [
-    ...getNodeAutoInstrumentations({
-      '@opentelemetry/instrumentation-http': {
-        enabled: true,
-        requestHook: SessionRecorderHttpInstrumentationHooksNode.requestHook({
-          // Mask sensitive headers from being captured in traces
-          maskHeadersList: ['Authorization', 'cookie', 'x-api-key'],
-          // Limit payload size to avoid huge traces
-          maxPayloadSizeBytes: 500000,
-          isMaskBodyEnabled: false,
-          isMaskHeadersEnabled: true
-        }),
-        responseHook: SessionRecorderHttpInstrumentationHooksNode.responseHook({
-          // Mask session/auth cookies in responses
-          maskHeadersList: ['set-cookie'],
-          maxPayloadSizeBytes: 500000,
-          isMaskBodyEnabled: false,
-          isMaskHeadersEnabled: true
-        })
-      }
-    })
-  ],
-  traceExporter: new SessionRecorderHttpTraceExporter({
-    apiKey: MULTIPLAYER_SDK_API_KEY,
-    url: MULTIPLAYER_OTEL_TRACES_EXPORTER_HTTP_URL // optional
-  }),
-  logRecordExporter: new SessionRecorderHttpLogsExporter({
-    apiKey: MULTIPLAYER_SDK_API_KEY,
-    url: MULTIPLAYER_OTEL_LOGS_EXPORTER_HTTP_URL // optional
-  }),
+  idGenerator: new SessionRecorderIdGenerator(),
+  spanProcessors: [new BatchSpanProcessor(traceExporter)],
 })
+tracerProvider.register()
 
-sdk.start()
+const loggerProvider = new LoggerProvider({
+  resource,
+  processors: [new BatchLogRecordProcessor(logRecordExporter)],
+})
+logs.setGlobalLoggerProvider(loggerProvider)
+
+registerInstrumentations({
+  instrumentations: [
+    new HttpInstrumentation({
+      requestHook: SessionRecorderHttpInstrumentationHooksNode.requestHook({
+        maskHeadersList: ['Authorization', 'cookie', 'x-api-key'],
+        maxPayloadSizeBytes: 500000,
+        isMaskBodyEnabled: false,
+        isMaskHeadersEnabled: true
+      }),
+      responseHook: SessionRecorderHttpInstrumentationHooksNode.responseHook({
+        maskHeadersList: ['set-cookie'],
+        maxPayloadSizeBytes: 500000,
+        isMaskBodyEnabled: false,
+        isMaskHeadersEnabled: true
+      })
+    }),
+    new ExpressInstrumentation(),
+    new UndiciInstrumentation(),
+  ],
+})
 
 console.log('[OpenTelemetry] Initialized with Multiplayer exporters')
 
-// Graceful shutdown
 process.on('SIGTERM', async () => {
   try {
-    await sdk.shutdown()
+    await tracerProvider.shutdown()
+    await loggerProvider.shutdown()
     console.log('[OpenTelemetry] SDK shut down successfully')
   } catch (error) {
     console.error('[OpenTelemetry] Error during SDK shutdown:', error)
