@@ -115,8 +115,8 @@ export default function AutoCreatedSessionModal() {
           </h2>
           <p id='auto-created-session-description' className='auto-created-session-description'>
             The full stack session - screens, traces, logs, requests, responses - has been recorded. Open the{' '}
-            <strong>Multiplayer Debugging Agent</strong> to see it analyze the issue, write a
-            patch, and fix it in real time. With real apps, it also opens a PR!
+            <strong>Multiplayer Debugging Agent CLI</strong> to see it analyze the issue, write a
+            patch, and fix it in real time.
           </p>
 
           <div className='auto-created-session-actions'>
