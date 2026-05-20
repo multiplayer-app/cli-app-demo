@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { notifications as initialNotifications } from '../data/mock'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Layout.css'
 
 const navItems = [
@@ -46,6 +47,7 @@ export default function Layout() {
       setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
     } catch (error) {
       showToast('Could not sync read receipts', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -101,6 +103,7 @@ export default function Layout() {
                   globalThis.__authBridge.terminateSession()
                 } catch (error) {
                   showToast('Could not terminate session', 'error')
+                  captureBug(error)
                   throw error
                 }
               }}

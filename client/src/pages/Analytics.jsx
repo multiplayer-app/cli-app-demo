@@ -15,6 +15,7 @@ import {
   Share2
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Analytics.css'
 
 const metrics = [
@@ -69,6 +70,7 @@ export default function Analytics() {
       showToast('Link copied to clipboard')
     } catch (error) {
       showToast('Failed to copy link to clipboard', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -80,6 +82,7 @@ export default function Analytics() {
       setCompareMode(!compareMode)
     } catch (error) {
       showToast('Could not resolve comparison baseline', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -190,6 +193,7 @@ export default function Analytics() {
                       setDateRange(r)
                     } catch (error) {
                       showToast('Could not load 90-day window', 'error')
+                      captureBug(error)
                       throw error
                     }
                   } else {
@@ -239,6 +243,7 @@ export default function Analytics() {
                         setMetric(m)
                       } catch (error) {
                         showToast('Could not switch to signups metric', 'error')
+                        captureBug(error)
                         throw error
                       }
                     } else {
@@ -262,6 +267,7 @@ export default function Analytics() {
                   setExpandedChart(expandedChart === 'activity' ? null : 'activity')
                 } catch (error) {
                   showToast('Could not persist panel layout', 'error')
+                  captureBug(error)
                   throw error
                 }
               }}
@@ -303,6 +309,7 @@ export default function Analytics() {
                     setExpandedChart(expandedChart === 'conversion' ? null : 'conversion')
                   } catch (error) {
                     showToast('Could not persist panel layout', 'error')
+                    captureBug(error)
                     throw error
                   }
                 }}

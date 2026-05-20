@@ -15,6 +15,7 @@ import {
   ChevronRight
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Users.css'
 
 const PAGE_SIZE = 6
@@ -136,6 +137,7 @@ export default function Users() {
       setShowModal(true)
     } catch (error) {
       showToast('Could not initialize new user form', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -198,6 +200,7 @@ export default function Users() {
       showToast('Users exported')
     } catch (error) {
       showToast(`Export failed: ${error.message}`, 'error')
+      captureBug(error)
       throw error
     } finally {
       setIsExporting(false)
@@ -238,6 +241,7 @@ export default function Users() {
                 window.__searchAnalytics.beginSession('users-search')
               } catch (error) {
                 showToast('Could not start search session', 'error')
+                captureBug(error)
                 throw error
               }
             }}
@@ -348,6 +352,7 @@ export default function Users() {
                                 showToast(`Email sent to ${user.name}`)
                               } catch (error) {
                                 showToast(`Email draft failed: ${error.message}`, 'error')
+                                captureBug(error)
                                 throw error
                               }
                               setActionMenu(null)

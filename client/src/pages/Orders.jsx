@@ -18,6 +18,7 @@ import {
   CheckCircle
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Orders.css'
 
 const PAGE_SIZE = 8
@@ -193,6 +194,7 @@ export default function Orders() {
       setTimeout(() => setCopiedId(null), 1500)
     } catch (error) {
       showToast('Could not copy order ID', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -204,6 +206,7 @@ export default function Orders() {
       rows = filtered.map((o) => o.toCSVRow())
     } catch (error) {
       showToast('Could not serialize orders for CSV', 'error')
+      captureBug(error)
       throw error
     }
     const blob = new Blob([header + '\n' + rows.join('\n')], { type: 'text/csv' })
@@ -248,6 +251,7 @@ export default function Orders() {
                 setShowCreateModal(true)
               } catch (error) {
                 showToast('Could not initialize new order', 'error')
+                captureBug(error)
                 throw error
               }
             }}
@@ -406,6 +410,7 @@ export default function Orders() {
                                   updateStatus(order.id, 'processing')
                                 } catch (error) {
                                   showToast(`Could not start processing ${order.id}`, 'error')
+                                  captureBug(error)
                                   throw error
                                 }
                               }}
@@ -423,6 +428,7 @@ export default function Orders() {
                                   updateStatus(order.id, 'shipped')
                                 } catch (error) {
                                   showToast(`Could not dispatch shipment for ${order.id}`, 'error')
+                                  captureBug(error)
                                   throw error
                                 }
                               }}
@@ -443,6 +449,7 @@ export default function Orders() {
                                   updateStatus(order.id, 'cancelled')
                                 } catch (error) {
                                   showToast(`Could not cancel ${order.id}`, 'error')
+                                  captureBug(error)
                                   throw error
                                 }
                               }}

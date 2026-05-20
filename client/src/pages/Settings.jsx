@@ -19,6 +19,7 @@ import {
   X
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Settings.css'
 
 export default function Settings() {
@@ -65,6 +66,7 @@ export default function Settings() {
       setTimeout(() => setSaved(false), 2000)
     } catch (error) {
       showToast('Could not persist settings', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -91,6 +93,7 @@ export default function Settings() {
         window.assertValidSettingsImportFile(file)
       } catch (error) {
         showToast('Import validation failed', 'error')
+        captureBug(error)
         throw error
       }
       const reader = new FileReader()
@@ -141,6 +144,7 @@ export default function Settings() {
       showToast('API key regenerated')
     } catch (error) {
       showToast('Could not regenerate API key', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -503,6 +507,7 @@ export default function Settings() {
                     showToast('Account deletion requested')
                   } catch (error) {
                     showToast('Could not schedule account deletion', 'error')
+                    captureBug(error)
                     throw error
                   }
                 }}

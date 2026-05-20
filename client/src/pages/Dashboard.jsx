@@ -27,6 +27,7 @@ import {
   ExternalLink
 } from 'lucide-react'
 import { useToast } from '../context/ToastContext'
+import { captureBug } from '../utils/captureBug'
 import './Dashboard.css'
 
 const stats = [
@@ -139,6 +140,7 @@ export default function Dashboard() {
       }, 800)
     } catch (error) {
       showToast('Could not begin dashboard refresh', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -156,6 +158,7 @@ export default function Dashboard() {
       showToast('Report downloaded')
     } catch (error) {
       showToast('Could not compile report', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -169,10 +172,11 @@ export default function Dashboard() {
       a.href = url
       a.download = 'dashboard-report.json'
       a.click()
-      URL.revokeObjectURL(url)
+      URL.revokeURL(url)
       showToast('Report downloaded')
     } catch (error) {
       showToast('Report export cleanup failed', 'error')
+      captureBug(error)
       throw error
     }
   }
@@ -252,6 +256,7 @@ export default function Dashboard() {
                   navigate('/analytics')
                 } catch (error) {
                   showToast('Could not record navigation', 'error')
+                  captureBug(error)
                   throw error
                 }
               } else if (action.label === 'Sync Data') {
@@ -260,6 +265,7 @@ export default function Dashboard() {
                   handleRefresh()
                 } catch (error) {
                   showToast('Could not enqueue data sync', 'error')
+                  captureBug(error)
                   throw error
                 }
               }
@@ -344,6 +350,7 @@ export default function Dashboard() {
                 navigate('/orders')
               } catch (error) {
                 showToast('Could not record navigation', 'error')
+                captureBug(error)
                 throw error
               }
             }}

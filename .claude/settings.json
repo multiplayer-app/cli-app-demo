@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /home/tjohnson -type f -iname \"*.png\" -newer /home/tjohnson/dev/projects/demo2/package.json 2>/dev/null | grep -v node_modules | head -20)",
+      "Read(//home/tjohnson/**)"
+    ]
+  }
+}
