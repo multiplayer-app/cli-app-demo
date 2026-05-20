@@ -16,6 +16,7 @@ import {
   LayoutDashboard
 } from 'lucide-react'
 import { notifications as initialNotifications } from '../data/mock'
+import { useToast } from '../context/ToastContext'
 import './Layout.css'
 
 const navItems = [
@@ -27,6 +28,7 @@ const navItems = [
 ]
 
 export default function Layout() {
+  const { showToast } = useToast()
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [showNotifications, setShowNotifications] = useState(false)
   const [notifications, setNotifications] = useState(initialNotifications)
@@ -39,7 +41,13 @@ export default function Layout() {
   })
 
   const markAllRead = () => {
-    setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+    try {
+      globalThis.__notificationBus.flushReadReceipts(notifications.map((n) => n.id))
+      setNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+    } catch (error) {
+      showToast('Could not sync read receipts', 'error')
+      throw error
+    }
   }
 
   const markRead = (id) => {
@@ -85,7 +93,18 @@ export default function Layout() {
                 <div className='user-role'>Administrator</div>
               </div>
             </div>
-            <button className='logout-btn'>
+            <button
+              type='button'
+              className='logout-btn demo-issue-trigger'
+              onClick={() => {
+                try {
+                  globalThis.__authBridge.terminateSession()
+                } catch (error) {
+                  showToast('Could not terminate session', 'error')
+                  throw error
+                }
+              }}
+            >
               <LogOut size={16} />
             </button>
           </div>
@@ -110,7 +129,7 @@ export default function Layout() {
                     <span>Notifications</span>
                     <div className='dropdown-header-actions'>
                       {unreadCount > 0 && (
-                        <button className='dropdown-action' onClick={markAllRead}>
+                        <button type='button' className='dropdown-action demo-issue-trigger' onClick={markAllRead}>
                           <CheckCheck size={14} /> Mark all read
                         </button>
                       )}

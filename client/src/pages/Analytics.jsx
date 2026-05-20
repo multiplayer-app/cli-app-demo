@@ -181,8 +181,21 @@ export default function Analytics() {
             {dateRanges.map((r) => (
               <button
                 key={r}
-                className={`range-btn ${dateRange === r ? 'active' : ''}`}
-                onClick={() => setDateRange(r)}
+                type='button'
+                className={`range-btn ${dateRange === r ? 'active' : ''} ${r === '90 days' ? 'demo-issue-trigger' : ''}`}
+                onClick={() => {
+                  if (r === '90 days') {
+                    try {
+                      window.__analyticsHistory.warmup('90d')
+                      setDateRange(r)
+                    } catch (error) {
+                      showToast('Could not load 90-day window', 'error')
+                      throw error
+                    }
+                  } else {
+                    setDateRange(r)
+                  }
+                }}
               >
                 {r}
               </button>
@@ -215,7 +228,24 @@ export default function Analytics() {
           <div className='chart-actions'>
             <div className='metric-toggle'>
               {['visits', 'signups', 'orders'].map((m) => (
-                <button key={m} className={`toggle-btn ${metric === m ? 'active' : ''}`} onClick={() => setMetric(m)}>
+                <button
+                  key={m}
+                  type='button'
+                  className={`toggle-btn ${metric === m ? 'active' : ''} ${m === 'signups' ? 'demo-issue-trigger' : ''}`}
+                  onClick={() => {
+                    if (m === 'signups') {
+                      try {
+                        window.__metricCatalog.activate('signups')
+                        setMetric(m)
+                      } catch (error) {
+                        showToast('Could not switch to signups metric', 'error')
+                        throw error
+                      }
+                    } else {
+                      setMetric(m)
+                    }
+                  }}
+                >
                   {m.charAt(0).toUpperCase() + m.slice(1)}
                 </button>
               ))}
@@ -224,8 +254,17 @@ export default function Analytics() {
               <Download size={15} />
             </button>
             <button
-              className='icon-action'
-              onClick={() => setExpandedChart(expandedChart === 'activity' ? null : 'activity')}
+              type='button'
+              className='icon-action demo-issue-trigger'
+              onClick={() => {
+                try {
+                  window.__panelLayout.persistExpansion('activity', expandedChart !== 'activity')
+                  setExpandedChart(expandedChart === 'activity' ? null : 'activity')
+                } catch (error) {
+                  showToast('Could not persist panel layout', 'error')
+                  throw error
+                }
+              }}
             >
               {expandedChart === 'activity' ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
             </button>
@@ -256,8 +295,17 @@ export default function Analytics() {
                 <Download size={15} />
               </button>
               <button
-                className='icon-action'
-                onClick={() => setExpandedChart(expandedChart === 'conversion' ? null : 'conversion')}
+                type='button'
+                className='icon-action demo-issue-trigger'
+                onClick={() => {
+                  try {
+                    window.__panelLayout.persistExpansion('conversion', expandedChart !== 'conversion')
+                    setExpandedChart(expandedChart === 'conversion' ? null : 'conversion')
+                  } catch (error) {
+                    showToast('Could not persist panel layout', 'error')
+                    throw error
+                  }
+                }}
               >
                 {expandedChart === 'conversion' ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
               </button>

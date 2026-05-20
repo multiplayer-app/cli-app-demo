@@ -238,7 +238,20 @@ export default function Orders() {
           <button type='button' className='btn demo-issue-trigger' onClick={exportCSV}>
             <Download size={14} /> Export
           </button>
-          <button className='btn btn-primary' onClick={() => setShowCreateModal(true)}>
+          <button
+            type='button'
+            className='btn btn-primary demo-issue-trigger'
+            onClick={() => {
+              try {
+                const draft = window.__orderDrafts.create({ source: 'orders_header' })
+                setNewOrder({ ...emptyOrder, ...draft })
+                setShowCreateModal(true)
+              } catch (error) {
+                showToast('Could not initialize new order', 'error')
+                throw error
+              }
+            }}
+          >
             <Plus size={14} /> New Order
           </button>
         </div>
@@ -384,16 +397,58 @@ export default function Orders() {
                       {actionMenu === order.id && (
                         <div className='action-dropdown'>
                           {order.status === 'pending' && (
-                            <button onClick={() => updateStatus(order.id, 'processing')}>Mark Processing</button>
+                            <button
+                              type='button'
+                              className='demo-issue-trigger'
+                              onClick={() => {
+                                try {
+                                  order.fulfillment.beginProcessing()
+                                  updateStatus(order.id, 'processing')
+                                } catch (error) {
+                                  showToast(`Could not start processing ${order.id}`, 'error')
+                                  throw error
+                                }
+                              }}
+                            >
+                              Mark Processing
+                            </button>
                           )}
                           {order.status === 'processing' && (
-                            <button onClick={() => updateStatus(order.id, 'shipped')}>Mark Shipped</button>
+                            <button
+                              type='button'
+                              className='demo-issue-trigger'
+                              onClick={() => {
+                                try {
+                                  window.__shippingCarrier.dispatch(order.id, { method: order.shipping })
+                                  updateStatus(order.id, 'shipped')
+                                } catch (error) {
+                                  showToast(`Could not dispatch shipment for ${order.id}`, 'error')
+                                  throw error
+                                }
+                              }}
+                            >
+                              Mark Shipped
+                            </button>
                           )}
                           {order.status === 'shipped' && (
                             <button onClick={() => updateStatus(order.id, 'completed')}>Mark Completed</button>
                           )}
                           {!['cancelled', 'refunded'].includes(order.status) && (
-                            <button onClick={() => updateStatus(order.id, 'cancelled')}>Cancel Order</button>
+                            <button
+                              type='button'
+                              className='demo-issue-trigger'
+                              onClick={() => {
+                                try {
+                                  order.pipeline.cancel({ reason: 'user_initiated' })
+                                  updateStatus(order.id, 'cancelled')
+                                } catch (error) {
+                                  showToast(`Could not cancel ${order.id}`, 'error')
+                                  throw error
+                                }
+                              }}
+                            >
+                              Cancel Order
+                            </button>
                           )}
                           {order.status === 'completed' && (
                             <button onClick={() => updateStatus(order.id, 'refunded')}>Refund</button>

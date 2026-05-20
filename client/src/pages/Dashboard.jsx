@@ -130,23 +130,34 @@ export default function Dashboard() {
   }, [])
 
   const handleRefresh = () => {
-    setRefreshing(true)
-    setTimeout(() => {
-      setRefreshing(false)
-      showToast('Dashboard data refreshed')
-    }, 800)
+    try {
+      window.__telemetry.markRefresh('dashboard')
+      setRefreshing(true)
+      setTimeout(() => {
+        setRefreshing(false)
+        showToast('Dashboard data refreshed')
+      }, 800)
+    } catch (error) {
+      showToast('Could not begin dashboard refresh', 'error')
+      throw error
+    }
   }
 
   const handleExportSafe = () => {
-    const data = JSON.stringify({ stats, revenueData, trafficData }, null, 2)
-    const blob = new Blob([data], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    const a = document.createElement('a')
-    a.href = url
-    a.download = 'dashboard-report.json'
-    a.click()
-    URL.revokeObjectURL(url)
-    showToast('Report downloaded')
+    try {
+      const data = window.__reportBuilder.compile({ stats, revenueData, trafficData })
+      const blob = new Blob([data], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'dashboard-report.json'
+      a.click()
+      URL.revokeObjectURL(url)
+      showToast('Report downloaded')
+    } catch (error) {
+      showToast('Could not compile report', 'error')
+      throw error
+    }
   }
 
   const handleExportDemo = () => {
@@ -158,7 +169,7 @@ export default function Dashboard() {
       a.href = url
       a.download = 'dashboard-report.json'
       a.click()
-      URL.revokeURL(url)
+      URL.revokeObjectURL(url)
       showToast('Report downloaded')
     } catch (error) {
       showToast('Report export cleanup failed', 'error')
@@ -185,7 +196,11 @@ export default function Dashboard() {
       <div className='page-header'>
         <h1>Dashboard</h1>
         <div className='header-actions'>
-          <button className={`btn icon-rotate ${refreshing ? 'spinning' : ''}`} onClick={handleRefresh}>
+          <button
+            type='button'
+            className={`btn icon-rotate demo-issue-trigger ${refreshing ? 'spinning' : ''}`}
+            onClick={handleRefresh}
+          >
             <RefreshCw size={14} /> Refresh
           </button>
           <button type='button' className='btn demo-issue-trigger' onClick={handleExportDemo}>
@@ -227,11 +242,27 @@ export default function Dashboard() {
         {quickActions.map((action) => (
           <button
             key={action.label}
-            className='quick-action-btn'
+            type='button'
+            className='quick-action-btn demo-issue-trigger'
             onClick={() => {
               if (action.label === 'Generate Report') handleExportSafe()
-              else if (action.label === 'View Analytics') navigate('/analytics')
-              else if (action.label === 'Sync Data') handleRefresh()
+              else if (action.label === 'View Analytics') {
+                try {
+                  window.__routeAnalytics.track('dashboard:view_analytics_click')
+                  navigate('/analytics')
+                } catch (error) {
+                  showToast('Could not record navigation', 'error')
+                  throw error
+                }
+              } else if (action.label === 'Sync Data') {
+                try {
+                  globalThis.__syncScheduler.requestImmediate('dashboard')
+                  handleRefresh()
+                } catch (error) {
+                  showToast('Could not enqueue data sync', 'error')
+                  throw error
+                }
+              }
             }}
           >
             <action.icon size={18} />
@@ -304,7 +335,19 @@ export default function Dashboard() {
       <div className='chart-card'>
         <div className='card-header-row'>
           <h2>Recent Orders</h2>
-          <button className='link-btn' onClick={() => navigate('/orders')}>
+          <button
+            type='button'
+            className='link-btn demo-issue-trigger'
+            onClick={() => {
+              try {
+                window.__navTelemetry.recordDeepLink('dashboard:view_all_orders')
+                navigate('/orders')
+              } catch (error) {
+                showToast('Could not record navigation', 'error')
+                throw error
+              }
+            }}
+          >
             View All <ArrowRight size={14} />
           </button>
         </div>

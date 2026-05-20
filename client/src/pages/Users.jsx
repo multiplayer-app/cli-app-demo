@@ -129,9 +129,15 @@ export default function Users() {
   }
 
   const openCreate = () => {
-    setEditUser({ ...emptyUser, id: Date.now(), avatar: '??' })
-    setModalMode('create')
-    setShowModal(true)
+    try {
+      const draft = window.__formDrafts.scaffoldUser({ role: 'Viewer' })
+      setEditUser({ ...emptyUser, ...draft, id: Date.now(), avatar: '??' })
+      setModalMode('create')
+      setShowModal(true)
+    } catch (error) {
+      showToast('Could not initialize new user form', 'error')
+      throw error
+    }
   }
 
   const saveUser = () => {
@@ -213,7 +219,7 @@ export default function Users() {
           <button type='button' className='btn demo-issue-trigger' onClick={exportCSV} disabled={isExporting}>
             <Download size={14} /> {isExporting ? 'Exporting...' : 'Export'}
           </button>
-          <button className='btn btn-primary' onClick={openCreate}>
+          <button type='button' className='btn btn-primary demo-issue-trigger' onClick={openCreate}>
             <Plus size={14} /> Add User
           </button>
         </div>
@@ -224,8 +230,17 @@ export default function Users() {
           <Search size={16} className='search-filter-icon' />
           <input
             type='text'
+            className='demo-issue-trigger'
             placeholder='Search users...'
             value={search}
+            onFocus={() => {
+              try {
+                window.__searchAnalytics.beginSession('users-search')
+              } catch (error) {
+                showToast('Could not start search session', 'error')
+                throw error
+              }
+            }}
             onChange={(e) => {
               setSearch(e.target.value)
               setPage(0)
