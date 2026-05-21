@@ -12,9 +12,8 @@
     "preview": "cd client && vite preview"
   },
   "dependencies": {
-    "@multiplayer-app/session-recorder-browser": "^2.0.67",
-    "@multiplayer-app/session-recorder-node": "^2.0.67",
-    "@multiplayer-app/session-recorder-react": "^2.0.67",
+    "@multiplayer-app/session-recorder-node": "^2.0.80",
+    "@multiplayer-app/session-recorder-react": "^2.0.80",
     "@opentelemetry/api": "^1.9.1",
     "@opentelemetry/api-logs": "^0.217.0",
     "@opentelemetry/instrumentation": "^0.217.0",
