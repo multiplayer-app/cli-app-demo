@@ -1,31 +1,10 @@
-/* Demo “break me” controls — single rgba for all rings; pulse varies spread only */
+/* Demo “break me” controls — static ring highlight (no animation for CPU) */
 
 .demo-issue-trigger {
   --demo-issue-ring: rgba(215, 52, 58, 0.45);
   position: relative;
   z-index: 1;
-  animation: demo-issue-pulse-shadow 2.4s ease-in-out infinite;
-}
-
-@keyframes demo-issue-pulse-shadow {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 0 var(--demo-issue-ring),
-      0 0 0 1px var(--demo-issue-ring);
-  }
-  50% {
-    box-shadow:
-      0 0 0 2px var(--demo-issue-ring),
-      0 0 0 5px var(--demo-issue-ring);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .demo-issue-trigger {
-    animation: none;
-    box-shadow:
-      0 0 0 1px var(--demo-issue-ring),
-      0 0 0 3px var(--demo-issue-ring);
-  }
+  box-shadow:
+    0 0 0 1px var(--demo-issue-ring),
+    0 0 0 3px var(--demo-issue-ring);
 }
