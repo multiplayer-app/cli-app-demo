@@ -10,7 +10,7 @@
 }
 
 .demo-issue-resolved {
-  --demo-issue-ring: rgba(0, 234, 70, 0.75);
+  --demo-issue-ring: rgb(0 171 51 / 49%);
   position: relative;
   z-index: 1;
   box-shadow:
