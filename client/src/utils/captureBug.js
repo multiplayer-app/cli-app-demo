@@ -7,5 +7,4 @@ import SessionRecorder from '@multiplayer-app/session-recorder-react'
 // custom DOM event the modal also listens for.
 export function captureBug(error) {
   SessionRecorder.captureException(error)
-  window.dispatchEvent(new CustomEvent('demo:bug-caught'))
 }
