@@ -78,11 +78,6 @@ export default function AutoCreatedSessionModal() {
     setRecordingUrl(null)
   }
 
-  const handleOpenRecording = () => {
-    if (!recordingUrl) return
-    window.open(recordingUrl, '_blank', 'noopener,noreferrer')
-  }
-
   if (!isOpen) return null
 
   const copy = isManual ? MANUAL_COPY : AUTO_COPY
@@ -142,16 +137,17 @@ export default function AutoCreatedSessionModal() {
               Continue
             </button>
             {isManual && recordingUrl && (
-              <button
-                type='button'
+              <a
+                href={recordingUrl}
+                target='_blank'
+                rel='noopener noreferrer'
                 className='auto-created-session-btn auto-created-session-btn-primary'
-                onClick={handleOpenRecording}
               >
                 Open recording
                 <span aria-hidden='true' className='auto-created-session-arrow'>
                   →
                 </span>
-              </button>
+              </a>
             )}
           </div>
         </div>
