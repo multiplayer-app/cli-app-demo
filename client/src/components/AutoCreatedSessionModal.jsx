@@ -2,20 +2,64 @@ import { useEffect, useState } from 'react'
 import { recorderEventBus } from '@multiplayer-app/session-recorder-react'
 import './AutoCreatedSessionModal.css'
 
-const PREVIEW_IMAGE = '/agent-preview.png'
+const DEBUG_SESSION_READY_EVENT = 'debug-session:ready'
+const AUTO_COPY = {
+  eyebrow: 'Bug captured',
+  callout: 'Agent is on it',
+  title: (
+    <>
+      We caught the bug. <span className='auto-created-session-title-accent'>Now watch the Agent fix it.</span>
+    </>
+  ),
+  description: (
+    <>
+      The full stack session — screens, traces, logs, requests, responses — has been recorded. Open the{' '}
+      <strong>Debugging Agent CLI</strong> to see it analyze the issue, write a patch, and fix it in real time.
+    </>
+  ),
+  previewImage: '/agent-preview.png',
+  imageAlt: 'Debugging Agent analyzing a captured bug session and opening a pull request'
+}
+
+const MANUAL_COPY = {
+  eyebrow: 'Recording complete',
+  callout: 'Ready to review',
+  title: (
+    <>
+      Your session was captured.{' '}
+      <span className='auto-created-session-title-accent'>Add notes, then send to an agent.</span>
+    </>
+  ),
+  description: (
+    <>
+      Your recording is saved in Multiplayer. Open it to review screens, traces, and logs, add notes on the spans that
+      matter, then send the recording to your <strong>Debugging Agent</strong> from the recording page.
+    </>
+  ),
+  steps: [
+    'Open your recording in Multiplayer',
+    'Add notes or star the traces and spans that matter',
+    'Send the recording to your debugging agent'
+  ],
+  previewImage: '/dashboard-preview.png',
+  imageAlt: 'Multiplayer dashboard showing a saved session recording ready to review'
+}
 
 export default function AutoCreatedSessionModal() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isManual, setIsManual] = useState(false)
+  const [recordingUrl, setRecordingUrl] = useState(null)
 
   useEffect(() => {
-    let openTimeoutId
-    const handleNavigationModal = () => {
-      openTimeoutId = window.setTimeout(() => setIsOpen(true), 2000)
+    const handleSessionReady = (payload) => {
+      const manual = payload?.sessionType === 'MANUAL'
+      setIsManual(manual)
+      setRecordingUrl(manual && payload?.url ? payload.url : null)
+      setIsOpen(true)
     }
-    recorderEventBus?.on('debug-session-ready', handleNavigationModal)
+    recorderEventBus?.on(DEBUG_SESSION_READY_EVENT, handleSessionReady)
     return () => {
-      recorderEventBus?.off('debug-session-ready', handleNavigationModal)
-      if (openTimeoutId) window.clearTimeout(openTimeoutId)
+      recorderEventBus?.off(DEBUG_SESSION_READY_EVENT, handleSessionReady)
     }
   }, [])
 
@@ -30,9 +74,18 @@ export default function AutoCreatedSessionModal() {
 
   const handleClose = () => {
     setIsOpen(false)
+    setIsManual(false)
+    setRecordingUrl(null)
+  }
+
+  const handleOpenRecording = () => {
+    if (!recordingUrl) return
+    window.open(recordingUrl, '_blank', 'noopener,noreferrer')
   }
 
   if (!isOpen) return null
+
+  const copy = isManual ? MANUAL_COPY : AUTO_COPY
 
   return (
     <div className='auto-created-session-backdrop' role='presentation' onClick={handleClose}>
@@ -46,31 +99,39 @@ export default function AutoCreatedSessionModal() {
       >
         <div className='auto-created-session-preview'>
           <div className='auto-created-session-image-wrap'>
-            <img
-              src={PREVIEW_IMAGE}
-              alt='Multiplayer Debugging Agent analyzing a captured bug session and opening a pull request'
-              className='auto-created-session-image'
-            />
-            <div className='auto-created-session-callout' aria-hidden='true'>
-              <span className='auto-created-session-callout-pulse' />
-              Agent is on it
+            <img src={copy.previewImage} alt={copy.imageAlt} className='auto-created-session-image' />
+            <div
+              className={`auto-created-session-callout${isManual ? ' auto-created-session-callout--manual' : ''}`}
+              aria-hidden='true'
+            >
+              {!isManual && <span className='auto-created-session-callout-pulse' />}
+              {copy.callout}
             </div>
           </div>
         </div>
 
         <div className='auto-created-session-body'>
-          <span className='auto-created-session-eyebrow'>
-            <span className='auto-created-session-eyebrow-dot' aria-hidden='true' />
-            Bug captured
+          <span className={`auto-created-session-eyebrow${isManual ? ' auto-created-session-eyebrow--manual' : ''}`}>
+            {!isManual && <span className='auto-created-session-eyebrow-dot' aria-hidden='true' />}
+            {copy.eyebrow}
           </span>
           <h2 id='auto-created-session-heading' className='auto-created-session-title'>
-            We caught the bug. <span className='auto-created-session-title-accent'>Now watch the Agent fix it.</span>
+            {copy.title}
           </h2>
           <p id='auto-created-session-description' className='auto-created-session-description'>
-            The full stack session - screens, traces, logs, requests, responses - has been recorded. Open the{' '}
-            <strong>Multiplayer Debugging Agent CLI</strong> to see it analyze the issue, write a patch, and fix it in
-            real time.
+            {copy.description}
           </p>
+
+          {isManual && copy.steps && (
+            <ol className='auto-created-session-steps' aria-label='Next steps'>
+              {copy.steps.map((step, index) => (
+                <li key={step} className='auto-created-session-step'>
+                  <span className='auto-created-session-step-num'>{index + 1}</span>
+                  {step}
+                </li>
+              ))}
+            </ol>
+          )}
 
           <div className='auto-created-session-actions'>
             <button
@@ -80,6 +141,18 @@ export default function AutoCreatedSessionModal() {
             >
               Continue
             </button>
+            {isManual && recordingUrl && (
+              <button
+                type='button'
+                className='auto-created-session-btn auto-created-session-btn-primary'
+                onClick={handleOpenRecording}
+              >
+                Open recording
+                <span aria-hidden='true' className='auto-created-session-arrow'>
+                  →
+                </span>
+              </button>
+            )}
           </div>
         </div>
       </div>
