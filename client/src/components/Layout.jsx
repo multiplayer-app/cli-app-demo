@@ -6,7 +6,6 @@ import {
   Users,
   Bell,
   Search,
-  LogOut,
   Settings,
   BarChart3,
   CheckCheck,
@@ -86,32 +85,6 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-        {sidebarOpen && (
-          <div className='sidebar-footer'>
-            <div className='user-info'>
-              <div className='user-avatar'>GK</div>
-              <div>
-                <div className='user-name'>Gegham K.</div>
-                <div className='user-role'>Administrator</div>
-              </div>
-            </div>
-            <button
-              type='button'
-              className='logout-btn demo-issue-trigger'
-              onClick={() => {
-                try {
-                  globalThis.__authBridge.terminateSession()
-                } catch (error) {
-                  showToast('Could not terminate session', 'error')
-                  captureBug(error)
-                  throw error
-                }
-              }}
-            >
-              <LogOut size={16} />
-            </button>
-          </div>
-        )}
       </aside>
 
       <div className='main-area'>
